@@ -1,131 +1,168 @@
-#%%
 import tkinter as tk
 import datetime
 from tkinter.filedialog import askopenfilename
-from  book_reader import *
-# Label(root, text = "Hello World!", font= ('Helvetica 25 bold')).place(relx=.5, rely=.5,anchor= CENTER)
+import time 
+from PyPDF2 import PdfReader
 
-inc_val = 1
+class PDFReader:
+    def __init__(self, path):
+        self.path = path
 
-def pause():
-    global inc_val
-    inc_val = 0 
+    def read(self):
+        with open(self.path, 'rb') as f:
+            pdf_reader = PdfReader(f)
+            for page in pdf_reader.pages:
+                text = page.extract_text()
+                words = text.split()
+                return [word for word in words]
+            
+class TextReaderApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Text Reader App")
 
-def play():
-    global inc_val
-    inc_val = 1
-    incc_L['text'] = inc_val
+        # Initialize variables
+        self.inc_val = 1
+        self.reading = False
+        self.current_page_index = 0
+        self.wpm = 150
+        self.path = None
+        self.pdf_reader = None
+        self.update_list_pointer = self.root.after(0, self.list_pointer)
 
-def increase_inc():
-    global inc_val
-    inc_val += 9
-    incc_L['text'] = inc_val
+        # Create GUI components
+        self.create_gui()
 
-def inc_wpm():
-    global wpm
-    wpm += 10
-    lbl_wpm['text'] = wpm
+    def create_gui(self):
+        # Create frames
+        fr_buttons = tk.Frame(self.root)
+        fr_play = tk.Frame(self.root)
+        fr_book = tk.Frame(self.root)
+        fr_wpm = tk.Frame(self.root)
 
-def dec_wpm():
-    global wpm
-    wpm -= 10
-    lbl_wpm['text'] = wpm
+        # Create buttons and labels
+        btn_open = tk.Button(fr_buttons, text="Open", command=self.open_file)
+        btn_save = tk.Button(fr_buttons, text="Save As...")  # Add functionality as needed
 
-def counting():
-    global number
-    number += inc_val
-    PN.config(text=number)
-    PN.after(1000, counting)
+        btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading)
+        btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading)
 
-def reset():
-    global ind
-    ind = 0
+        incc = tk.Button(fr_play, text='\u003E\u003E', command=self.increase_inc)
 
-reading = False
-ind = 0
-wpm = 150
-def list_pointer():
-    global ind
-    global wpm
-    if reading is True:
-        ind +=1 
-    new = dd[ind]
-    text.config(text=new)
-    text.after(int(60000/wpm), list_pointer)
+        btn_inc_wpm = tk.Button(fr_wpm, text="\u002B", command=self.inc_wpm)
+        lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
+        btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm)
+        btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset)
 
-def ch_reading():
-    global reading
-    if reading is False:
-        reading = True
-    elif reading is True:
-        reading = False
-    return reading
+        # Create labels
+        self.text_label = tk.Label(self.root, text='not started')
+        self.lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
 
-root = tk.Tk()
-root.rowconfigure([0,1,2], minsize=1, weight=1)
-root.columnconfigure([0,1,2], minsize=1, weight=1)
+        # Grid layout
+        fr_buttons.grid(row=0, column=0, sticky="ns")
+        fr_play.grid(row=1, column=0, sticky='ns')
+        fr_book.grid(row=2, column=1)
+        fr_wpm.grid(row=3, column=1)
 
-fr_buttons = tk.Frame(root)
-btn_open = tk.Button(fr_buttons, text="Open")
-btn_save = tk.Button(fr_buttons, text="Save As...")
-# btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
-# btn_save.grid(row=0, column=1, sticky="ew")
-# fr_buttons.grid(row=0, column=0, sticky="ns")
-fr_play = tk.Frame(root)
-btn_pause = tk.Button(fr_play, text='||', command=pause)
-btn_play = tk.Button(fr_play, text='|>', command=play)
-incc = tk.Button(fr_play, text='>>', command=increase_inc)
-# btn_pause.grid(row=0, column=0)
-# btn_play.grid(row=0,column=1)
-# incc.grid(row=0, column=2)
-# fr_play.grid(row=1, column=0, sticky='ns')
+        btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
 
-number = 0
-PN = tk.Label(master=root, text=number, font=(12))
-# PN.grid(row=2, column=1)
-incc_L = tk.Label(master=root, text=inc_val)
-# incc_L.grid(row=2,column=2)
+        btn_inc_wpm = tk.Button(fr_wpm, text="+", command=self.inc_wpm)
+        btn_inc_wpm.grid(row=0, column=0)
 
-counting()
+        self.lbl_wpm.grid(row=0, column=1)
 
-dd = ['a', 'b', 'c', 'd', 'e', 'a1', 'b1', 'c1', 'd1', 'e1', 'a2', 'b2', 'c2', 'd2', 'e2', 'a3', 'b3', 'c3', 'd3', 'e3', 'a4', 'b4', 'c4', 'd4', 'e4', 'a5', 'b5', 'c5', 'd5', 'e5'\
-    'a', 'b', 'c', 'd', 'e', 'a1', 'b1', 'c1', 'd1', 'e1', 'a2', 'b2', 'c2', 'd2', 'e2', 'a3', 'b3', 'c3', 'd3', 'e3', 'a4', 'b4', 'c4', 'd4', 'e4', 'a5', 'b5', 'c5', 'd5', 'e5'\
-        'a', 'b', 'c', 'd', 'e', 'a1', 'b1', 'c1', 'd1', 'e1', 'a2', 'b2', 'c2', 'd2', 'e2', 'a3', 'b3', 'c3', 'd3', 'e3', 'a4', 'b4', 'c4', 'd4', 'e4', 'a5', 'b5', 'c5', 'd5', 'e5'\
-            'a', 'b', 'c', 'd', 'e', 'a1', 'b1', 'c1', 'd1', 'e1', 'a2', 'b2', 'c2', 'd2', 'e2', 'a3', 'b3', 'c3', 'd3', 'e3', 'a4', 'b4', 'c4', 'd4', 'e4', 'a5', 'b5', 'c5', 'd5', 'e5']
-text = tk.Label(master=root, text='not started')
-text.grid(row=0 , column=1)
+        btn_dec_wpm.grid(row=0, column=2)
+        btn_rst.grid(row=0, column=3)
+        btn_save.grid(row=0, column=1, sticky="ew")
+        
+        btn_pause.grid(row=0, column=0)
+        btn_play.grid(row=0, column=1)
+        incc.grid(row=0, column=2)
 
-fr_book = tk.Frame(root)
-btn_start = tk.Button(fr_book, text='|>', command=ch_reading)
-btn_stop = tk.Button(fr_book,  text='||', command=ch_reading)
+        btn_inc_wpm.grid(row=0, column=0)
+        lbl_wpm.grid(row=0, column=1)
+        btn_dec_wpm.grid(row=0, column=2)
+        btn_rst.grid(row=0, column=3)
 
-fr_book.grid(row=1, column=1)
-btn_stop.grid(row=0, column=1)
-btn_start.grid(row=0, column=2)
+        self.text_label.grid(row=0, column=1)
 
-
-
-fr_wpm = tk.Frame(root)
-btn_inc_wpm = tk.Button(fr_wpm, text="+", command=inc_wpm)
-lbl_wpm = tk.Label(fr_wpm, text=wpm)
-btn_dec_wpm = tk.Button(fr_wpm, text='-', command=dec_wpm)
-btn_rst = tk.Button(fr_wpm, text='R',command=reset())
-fr_wpm.grid(row=2, column=1)
-
-btn_inc_wpm.grid(row=0, column=2)
-lbl_wpm.grid(row=1,column=2)
-btn_dec_wpm.grid(row=2, column=2)
-btn_rst.grid(row=3, column=2)
-
-
-list_pointer()
-
-def clock():
-    time = datetime.datetime.now().strftime("Time: %H:%M:%S")
-    root.title(time)
-    root.after(1000, clock) # run itself again after 1000 ms
+        # Other setup
+        self.counting()
+        self.clock()
     
-clock()
+    def list_pointer(self):
+        if self.reading and self.pdf_reader:
+            try:
+                words_per_iteration = 1  # Adjust this value based on user preference
+                for _ in range(words_per_iteration):
+                    new_text = self.pdf_reader.read()[self.current_page_index]
+                    self.text_label.config(text=new_text)
+                    self.current_page_index += 1
+            except IndexError:
+                # End of the document, stop reading
+                self.reading = False
+        self.root.after(int(60000 / self.wpm), self.list_pointer)
 
-root.mainloop()
-#%%
+
+    def update_list_pointer(self):
+        if self.reading:
+            self.current_page_index += self.inc_val
+            self.list_pointer()
+
+    def open_file(self):
+        self.path = askopenfilename(filetypes=[("PDF files", "*.pdf")])
+        if self.path:
+            self.pdf_reader = PDFReader(self.path)
+            self.current_page_index = 0
+            self.update_text_label()
+
+    def pause(self):
+        self.inc_val = 0
+
+    def play(self):
+        self.inc_val = 1
+        self.text_label['text'] = self.inc_val
+
+    def increase_inc(self):
+        self.inc_val += 9
+        self.text_label['text'] = self.inc_val
+
+    def inc_wpm(self):
+        self.wpm += 10
+        self.lbl_wpm['text'] = self.wpm
+        
+
+    def dec_wpm(self):
+        self.wpm -= 10
+        self.lbl_wpm['text'] = self.wpm
+
+    def counting(self):
+        if self.inc_val and self.reading:
+            self.current_page_index += self.inc_val
+            self.update_text_label()
+        self.root.after(1000, self.counting)
+
+    def reset(self):
+        self.current_page_index = 0
+
+    def toggle_reading(self):
+        self.reading = not self.reading
+
+    def update_text_label(self):
+        if self.reading and self.pdf_reader:
+            try:
+                new_text = self.pdf_reader.read()[self.current_page_index]
+                self.text_label.config(text=new_text)
+            except IndexError:
+                # End of the document, stop reading
+                self.reading = False
+
+    def clock(self):
+        time = datetime.datetime.now().strftime("Time: %H:%M:%S")
+        self.root.title(time)
+        self.root.after(1000, self.clock)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = TextReaderApp(root)
+    root.mainloop()
