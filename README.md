@@ -8,13 +8,7 @@ Welcome to the Speed Reader App repository! This project aims to create a Python
 - Customize the words per minute (WPM) to control the reading speed.
 - Start, stop, and pause functionality for user convenience.
 - User-friendly interface with buttons for easy interaction.
-
 ## Getting Started
-
-### Prerequisites
-
-- Python 3.x
-- Tkinter library (usually included with Python)
 
 ### Installation
 
@@ -30,6 +24,7 @@ Welcome to the Speed Reader App repository! This project aims to create a Python
 
 - Implement Optical Character Recognition (OCR) functionality to allow reading text from images.
 - Enhance the user interface for a more polished and professional look.
+- Editing the displayed text by emphasizing certain letters in **bold**. This will help users read even faster
 - Include additional features based on user feedback.
 
 ## Contributing
@@ -39,6 +34,3 @@ Contributions are welcome! Feel free to open issues or submit pull requests to i
 ## License
 
 This project is licensed under the MIT License.
-
-**Note:** The above README is a basic template. You can customize it further based on your specific project details, structure, and future plans.
-
