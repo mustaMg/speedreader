@@ -3,6 +3,8 @@ import datetime
 from tkinter.filedialog import askopenfilename
 import time 
 from PyPDF2 import PdfReader
+from tkinter import ttk
+
 
 class PDFReader:
     def __init__(self, path):
@@ -28,7 +30,23 @@ class TextReaderApp:
         self.wpm = 150
         self.path = None
         self.pdf_reader = None
+        self.lbl_wpm = None
         self.update_list_pointer = self.root.after(0, self.list_pointer)
+
+        self.style = ttk.Style()
+        self.style.theme_use('default')  # You can experiment with other themes
+
+        # Center the window on the screen
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        window_width = 800  # Set your desired window width
+        window_height = 600  # Set your desired window height
+
+        x_position = (screen_width - window_width) // 2
+        y_position = (screen_height - window_height) // 2
+
+        root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
         # Create GUI components
         self.create_gui()
@@ -37,54 +55,46 @@ class TextReaderApp:
         # Create frames
         fr_buttons = tk.Frame(self.root)
         fr_play = tk.Frame(self.root)
-        fr_book = tk.Frame(self.root)
         fr_wpm = tk.Frame(self.root)
 
-        # Create buttons and labels
-        btn_open = tk.Button(fr_buttons, text="Open", command=self.open_file)
-        btn_save = tk.Button(fr_buttons, text="Save As...")  # Add functionality as needed
+        # Create buttons and labels with increased font size
+        btn_open = tk.Button(fr_buttons, text="Open", command=self.open_file, font=("Helvetica", 14))
+        btn_save = tk.Button(fr_buttons, text="Save As...", font=("Helvetica", 14))  # Add functionality as needed
 
-        btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading)
-        btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading)
+        self.text_label = tk.Label(self.root, text='not started', font=("Helvetica", 50))
 
-        incc = tk.Button(fr_play, text='\u003E\u003E', command=self.increase_inc)
+        btn_inc_wpm = tk.Button(fr_wpm, text="+", command=self.inc_wpm, font=("Helvetica", 14))
+        self.lbl_wpm = tk.Label(fr_wpm, text=self.wpm, font=("Helvetica", 14))
+        btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm, font=("Helvetica", 14))
+        btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset, font=("Helvetica", 14))
 
-        btn_inc_wpm = tk.Button(fr_wpm, text="\u002B", command=self.inc_wpm)
-        lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
-        btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm)
-        btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset)
 
-        # Create labels
-        self.text_label = tk.Label(self.root, text='not started')
-        self.lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
+        btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading, font=("Helvetica", 14))
+        btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading, font=("Helvetica", 14))
 
         # Grid layout
-        fr_buttons.grid(row=0, column=0, sticky="ns")
-        fr_play.grid(row=1, column=0, sticky='ns')
-        fr_book.grid(row=2, column=1)
-        fr_wpm.grid(row=3, column=1)
+        fr_buttons.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
+        fr_play.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
+        fr_wpm.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
 
-        btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        btn_open.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
+        btn_save.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
 
-        btn_inc_wpm = tk.Button(fr_wpm, text="+", command=self.inc_wpm)
-        btn_inc_wpm.grid(row=0, column=0)
+        self.text_label.grid(row=0, column=1, pady=50)
 
-        self.lbl_wpm.grid(row=0, column=1)
+        btn_pause.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        btn_play.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
 
-        btn_dec_wpm.grid(row=0, column=2)
-        btn_rst.grid(row=0, column=3)
-        btn_save.grid(row=0, column=1, sticky="ew")
+        btn_inc_wpm.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
+        self.lbl_wpm.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        btn_dec_wpm.grid(row=0, column=2, padx=10, pady=10, sticky="ew")
+        btn_rst.grid(row=1, column=0, columnspan=3, pady=10, sticky="ew")
         
-        btn_pause.grid(row=0, column=0)
-        btn_play.grid(row=0, column=1)
-        incc.grid(row=0, column=2)
 
-        btn_inc_wpm.grid(row=0, column=0)
-        lbl_wpm.grid(row=0, column=1)
-        btn_dec_wpm.grid(row=0, column=2)
-        btn_rst.grid(row=0, column=3)
-
-        self.text_label.grid(row=0, column=1)
+        # Set row and column weights for grid resizing
+        for i in range(3):
+            self.root.grid_rowconfigure(i, weight=1)
+            self.root.grid_columnconfigure(i, weight=1)
 
         # Other setup
         self.counting()
