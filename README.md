@@ -20,8 +20,11 @@ Welcome to the Speed Reader App repository! This project aims to create a Python
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/mustafagumustas/speed-reader-app.git
+   git clone https://github.com/mustafagumustas/speedreader.git
 
+2. Install necessary the necessary libraries
+    ```
+    conda create --name <env> --file requirements.txt
 
 ## Future Plans
 
