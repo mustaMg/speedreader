@@ -4,7 +4,9 @@ from tkinter.filedialog import askopenfilename
 import time 
 from PyPDF2 import PdfReader
 from tkinter import ttk
+import string
 
+print(ttk)
 
 class PDFReader:
     def __init__(self, path):
@@ -16,8 +18,9 @@ class PDFReader:
             for page in pdf_reader.pages:
                 text = page.extract_text()
                 words = text.split()
-                return [word for word in words]
-            
+                words_without_punctuations = [word.strip(string.punctuation) for word in words]
+                return [word for word in words_without_punctuations]
+
 class TextReaderApp:
     def __init__(self, root):
         self.root = root
@@ -40,8 +43,8 @@ class TextReaderApp:
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
 
-        window_width = 800  # Set your desired window width
-        window_height = 600  # Set your desired window height
+        window_width = 600  # Set your desired window width
+        window_height = 400  # Set your desired window height
 
         x_position = (screen_width - window_width) // 2
         y_position = (screen_height - window_height) // 2
@@ -68,33 +71,37 @@ class TextReaderApp:
         btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm, font=("Helvetica", 14))
         btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset, font=("Helvetica", 14))
 
-
         btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading, font=("Helvetica", 14))
         btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading, font=("Helvetica", 14))
 
         # Grid layout
-        fr_buttons.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
-        fr_play.grid(row=1, column=0, sticky='nsew', padx=10, pady=10)
-        fr_wpm.grid(row=2, column=0, sticky="nsew", padx=10, pady=10)
+        fr_buttons.grid(row=0, column=0, sticky="nsew", padx=10, pady=10, columnspan=5)
+        fr_wpm.grid(row=1, column=0, sticky='nsew', padx=10, pady=10, columnspan=5)
+        fr_play.grid(row=2, column=0, sticky="nsew", padx=50, pady=10, columnspan=5)
 
-        btn_open.grid(row=0, column=0, sticky="ew", padx=10, pady=10)
-        btn_save.grid(row=1, column=0, sticky="ew", padx=10, pady=10)
+        self.text_label.grid(row=0, column=0, pady=75, columnspan=5, sticky="nsew")
 
-        self.text_label.grid(row=0, column=1, pady=50)
+        # WPM-related buttons
+        btn_inc_wpm.grid(row=1, column=1, padx=(400/2, 10), pady=5, sticky="nsew")
+        self.lbl_wpm.grid(row=1, column=2, padx=10, pady=5, sticky="nsew")
+        btn_dec_wpm.grid(row=1, column=3, padx=(10, 50), pady=5, sticky="nsew")
 
-        btn_pause.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
-        btn_play.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
+        # Play/Pause buttons
+        btn_pause.grid(row=2, column=0, padx=(400/2, 10), pady=10, sticky="nsew")
+        btn_play.grid(row=2, column=1, padx=(10, 400/2), pady=10, sticky="nsew")
 
-        btn_inc_wpm.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
-        self.lbl_wpm.grid(row=0, column=1, padx=10, pady=10, sticky="ew")
-        btn_dec_wpm.grid(row=0, column=2, padx=10, pady=10, sticky="ew")
-        btn_rst.grid(row=1, column=0, columnspan=3, pady=10, sticky="ew")
-        
+        # Reset button in a new line
+        btn_rst.grid(row=3, column=2, pady=10, sticky="ew")
+
+        # Open/Save As buttons
+        btn_open.grid(row=4, column=1, padx=(400/2, 10), pady=10, sticky="ew")
+        btn_save.grid(row=4, column=3, padx=(10, 400/2), pady=10, sticky="ew")
 
         # Set row and column weights for grid resizing
-        for i in range(3):
+        for i in range(5):
             self.root.grid_rowconfigure(i, weight=1)
             self.root.grid_columnconfigure(i, weight=1)
+
 
         # Other setup
         self.counting()
@@ -162,14 +169,15 @@ class TextReaderApp:
         if self.reading and self.pdf_reader:
             try:
                 new_text = self.pdf_reader.read()[self.current_page_index]
+                print(new_text)
                 self.text_label.config(text=new_text)
             except IndexError:
                 # End of the document, stop reading
                 self.reading = False
 
     def clock(self):
-        time = datetime.datetime.now().strftime("Time: %H:%M:%S")
-        self.root.title(time)
+        time_str = datetime.datetime.now().strftime("Time: %H:%M:%S")
+        self.root.title(time_str)
         self.root.after(1000, self.clock)
 
 if __name__ == "__main__":
