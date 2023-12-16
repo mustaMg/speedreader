@@ -110,14 +110,19 @@ class TextReaderApp:
         if self.reading and self.pdf_reader:
             try:
                 words_per_iteration = 1  # Adjust this value based on user preference
-                for _ in range(words_per_iteration):
-                    new_text = self.pdf_reader.read()[self.current_page_index]
-                    self.text_label.config(text=new_text)
-                    self.current_page_index += 1
+                sentence = " ".join(self.pdf_reader.read()[self.current_page_index:self.current_page_index + words_per_iteration])
+                self.text_label.config(text=sentence)
+                self.current_page_index += words_per_iteration
             except IndexError:
                 # End of the document, stop reading
                 self.reading = False
-        self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
+        self.root.after(int(60000 / self.wpm), self.list_pointer)
+
+
+    def update_list_pointer(self):
+        if self.reading:
+            self.current_page_index += self.inc_val
+            self.list_pointer()
 
     def open_file(self):
         self.path = askopenfilename(filetypes=[("PDF files", "*.pdf")])
@@ -126,15 +131,29 @@ class TextReaderApp:
             self.current_page_index = 0
             self.update_text_label()
 
+    def pause(self):
+        self.inc_val = 0
+
+    def play(self):
+        self.inc_val = 1
+        self.text_label['text'] = self.inc_val
+
+    def increase_inc(self):
+        self.inc_val += 9
+        self.text_label['text'] = self.inc_val
+
     def inc_wpm(self):
         self.wpm += 10
         self.lbl_wpm['text'] = self.wpm
-        self.reset_list_pointer()
+        self.root.after_cancel(self.update_list_pointer)  # Cancel the previous scheduled event
+        self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
+
 
     def dec_wpm(self):
         self.wpm -= 10
         self.lbl_wpm['text'] = self.wpm
-        self.reset_list_pointer()
+        self.root.after_cancel(self.update_list_pointer)  # Cancel the previous scheduled event
+        self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
 
     def counting(self):
         if self.inc_val and self.reading:
@@ -144,12 +163,6 @@ class TextReaderApp:
 
     def reset(self):
         self.current_page_index = 0
-        self.reset_list_pointer()
-
-    def reset_list_pointer(self):
-        if self.update_list_pointer:
-            self.root.after_cancel(self.update_list_pointer)
-            self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
 
     def toggle_reading(self):
         self.reading = not self.reading
@@ -167,7 +180,6 @@ class TextReaderApp:
         time_str = datetime.datetime.now().strftime("Time: %H:%M:%S")
         self.root.title(time_str)
         self.root.after(1000, self.clock)
-
 
 if __name__ == "__main__":
     root = tk.Tk()
