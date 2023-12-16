@@ -1,36 +1,48 @@
-# Speed Reader App
+# Text Reader App
 
-Welcome to the Speed Reader App repository! This project aims to create a Python application that helps users read text at an accelerated pace by displaying words on the screen.
+Text Reader App is a simple Python application for reading text or PDF files at a specified words-per-minute (WPM) rate. It provides a user-friendly interface for adjusting the reading speed and controlling the reading process.
 
 ## Features
 
-- Load PDF files to extract and display text.
-- Customize the words per minute (WPM) to control the reading speed.
-- Start, stop, and pause functionality for user convenience.
-- User-friendly interface with buttons for easy interaction.
+- Open and read PDF files.
+- Adjust reading speed with WPM controls.
+- Play, pause, and reset functionality.
+- Real-time display of the current word being read.
+
 ## Getting Started
 
-### Installation
+1. **Clone the repository:**
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/mustafagumustas/speedreader.git
-
-2. Install necessary the necessary libraries
+    ```bash
+    git clone https://github.com/your-username/text-reader-app.git
+    cd text-reader-app
     ```
-    conda create --name <env> --file requirements.txt
 
-## Future Plans
+2. **Install dependencies:**
 
-- Implement Optical Character Recognition (OCR) functionality to allow reading text from images.
-- Enhance the user interface for a more polished and professional look.
-- Editing the displayed text by emphasizing certain letters in **bold**. This will help users read even faster
-- Include additional features based on user feedback.
+    ```bash
+    pip install PyPDF2  # Install additional dependencies if needed
+    ```
+
+3. **Run the application:**
+
+    ```bash
+    python main.py
+    ```
+
+4. **Usage:**
+
+   - Open a PDF file using the "Open" button.
+   - Adjust the WPM speed using the "+" and "-" buttons.
+   - Press the play button to start reading.
+   - Use the pause button to pause the reading process.
+   - Reset button resets the reading to the beginning.
+   - Open/Save As buttons provide file-related functionalities.
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests to improve the functionality or address any bugs.
+Contributions are welcome! If you have ideas for improvements or find bugs, please create an issue or submit a pull request.
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
