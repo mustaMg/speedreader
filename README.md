@@ -42,7 +42,3 @@ Text Reader App is a simple Python application for reading text or PDF files at 
 ## Contributing
 
 Contributions are welcome! If you have ideas for improvements or find bugs, please create an issue or submit a pull request.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
