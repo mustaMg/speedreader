@@ -3,6 +3,10 @@ import datetime
 from tkinter.filedialog import askopenfilename
 import time 
 from PyPDF2 import PdfReader
+from tkinter import ttk
+import string
+
+print(ttk)
 
 class PDFReader:
     def __init__(self, path):
@@ -15,7 +19,7 @@ class PDFReader:
                 text = page.extract_text()
                 words = text.split()
                 return [word for word in words]
-            
+
 class TextReaderApp:
     def __init__(self, root):
         self.root = root
@@ -28,7 +32,23 @@ class TextReaderApp:
         self.wpm = 150
         self.path = None
         self.pdf_reader = None
+        self.lbl_wpm = None
         self.update_list_pointer = self.root.after(0, self.list_pointer)
+
+        self.style = ttk.Style()
+        self.style.theme_use('default')  # You can experiment with other themes
+
+        # Center the window on the screen
+        screen_width = root.winfo_screenwidth()
+        screen_height = root.winfo_screenheight()
+
+        window_width = 600  # Set your desired window width
+        window_height = 400  # Set your desired window height
+
+        x_position = (screen_width - window_width) // 2
+        y_position = (screen_height - window_height) // 2
+
+        root.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
 
         # Create GUI components
         self.create_gui()
@@ -37,54 +57,50 @@ class TextReaderApp:
         # Create frames
         fr_buttons = tk.Frame(self.root)
         fr_play = tk.Frame(self.root)
-        fr_book = tk.Frame(self.root)
         fr_wpm = tk.Frame(self.root)
 
-        # Create buttons and labels
-        btn_open = tk.Button(fr_buttons, text="Open", command=self.open_file)
-        btn_save = tk.Button(fr_buttons, text="Save As...")  # Add functionality as needed
+        # Create buttons and labels with increased font size
+        btn_open = tk.Button(fr_buttons, text="Open", command=self.open_file, font=("Helvetica", 14))
+        btn_save = tk.Button(fr_buttons, text="Save As...", font=("Helvetica", 14))  # Add functionality as needed
 
-        btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading)
-        btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading)
+        self.text_label = tk.Label(self.root, text='not started', font=("Helvetica", 50))
 
-        incc = tk.Button(fr_play, text='\u003E\u003E', command=self.increase_inc)
+        btn_inc_wpm = tk.Button(fr_wpm, text="+", command=self.inc_wpm, font=("Helvetica", 14))
+        self.lbl_wpm = tk.Label(fr_wpm, text=self.wpm, font=("Helvetica", 14))
+        btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm, font=("Helvetica", 14))
+        btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset, font=("Helvetica", 14))
 
-        btn_inc_wpm = tk.Button(fr_wpm, text="\u002B", command=self.inc_wpm)
-        lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
-        btn_dec_wpm = tk.Button(fr_wpm, text='-', command=self.dec_wpm)
-        btn_rst = tk.Button(fr_wpm, text='Reset', command=self.reset)
-
-        # Create labels
-        self.text_label = tk.Label(self.root, text='not started')
-        self.lbl_wpm = tk.Label(fr_wpm, text=self.wpm)
+        btn_pause = tk.Button(fr_play, text='\u23F8', command=self.toggle_reading, font=("Helvetica", 14))
+        btn_play = tk.Button(fr_play, text='\u25B6', command=self.toggle_reading, font=("Helvetica", 14))
 
         # Grid layout
-        fr_buttons.grid(row=0, column=0, sticky="ns")
-        fr_play.grid(row=1, column=0, sticky='ns')
-        fr_book.grid(row=2, column=1)
-        fr_wpm.grid(row=3, column=1)
+        fr_buttons.grid(row=0, column=0, sticky="nsew", padx=10, pady=10, columnspan=5)
+        fr_wpm.grid(row=1, column=0, sticky='nsew', padx=10, pady=10, columnspan=5)
+        fr_play.grid(row=2, column=0, sticky="nsew", padx=50, pady=10, columnspan=5)
 
-        btn_open.grid(row=0, column=0, sticky="ew", padx=5, pady=5)
+        self.text_label.grid(row=0, column=0, pady=75, columnspan=5, sticky="nsew")
 
-        btn_inc_wpm = tk.Button(fr_wpm, text="+", command=self.inc_wpm)
-        btn_inc_wpm.grid(row=0, column=0)
+        # WPM-related buttons
+        btn_inc_wpm.grid(row=1, column=1, padx=(400/2, 10), pady=5, sticky="nsew")
+        self.lbl_wpm.grid(row=1, column=2, padx=10, pady=5, sticky="nsew")
+        btn_dec_wpm.grid(row=1, column=3, padx=(10, 50), pady=5, sticky="nsew")
 
-        self.lbl_wpm.grid(row=0, column=1)
+        # Play/Pause buttons
+        btn_pause.grid(row=2, column=0, padx=(400/2, 10), pady=10, sticky="nsew")
+        btn_play.grid(row=2, column=1, padx=(10, 400/2), pady=10, sticky="nsew")
 
-        btn_dec_wpm.grid(row=0, column=2)
-        btn_rst.grid(row=0, column=3)
-        btn_save.grid(row=0, column=1, sticky="ew")
-        
-        btn_pause.grid(row=0, column=0)
-        btn_play.grid(row=0, column=1)
-        incc.grid(row=0, column=2)
+        # Reset button in a new line
+        btn_rst.grid(row=3, column=2, pady=10, sticky="ew")
 
-        btn_inc_wpm.grid(row=0, column=0)
-        lbl_wpm.grid(row=0, column=1)
-        btn_dec_wpm.grid(row=0, column=2)
-        btn_rst.grid(row=0, column=3)
+        # Open/Save As buttons
+        btn_open.grid(row=4, column=1, padx=(400/2, 10), pady=10, sticky="ew")
+        btn_save.grid(row=4, column=3, padx=(10, 400/2), pady=10, sticky="ew")
 
-        self.text_label.grid(row=0, column=1)
+        # Set row and column weights for grid resizing
+        for i in range(5):
+            self.root.grid_rowconfigure(i, weight=1)
+            self.root.grid_columnconfigure(i, weight=1)
+
 
         # Other setup
         self.counting()
@@ -94,10 +110,9 @@ class TextReaderApp:
         if self.reading and self.pdf_reader:
             try:
                 words_per_iteration = 1  # Adjust this value based on user preference
-                for _ in range(words_per_iteration):
-                    new_text = self.pdf_reader.read()[self.current_page_index]
-                    self.text_label.config(text=new_text)
-                    self.current_page_index += 1
+                sentence = " ".join(self.pdf_reader.read()[self.current_page_index:self.current_page_index + words_per_iteration])
+                self.text_label.config(text=sentence)
+                self.current_page_index += words_per_iteration
             except IndexError:
                 # End of the document, stop reading
                 self.reading = False
@@ -130,11 +145,15 @@ class TextReaderApp:
     def inc_wpm(self):
         self.wpm += 10
         self.lbl_wpm['text'] = self.wpm
-        
+        self.root.after_cancel(self.update_list_pointer)  # Cancel the previous scheduled event
+        self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
+
 
     def dec_wpm(self):
         self.wpm -= 10
         self.lbl_wpm['text'] = self.wpm
+        self.root.after_cancel(self.update_list_pointer)  # Cancel the previous scheduled event
+        self.update_list_pointer = self.root.after(int(60000 / self.wpm), self.list_pointer)
 
     def counting(self):
         if self.inc_val and self.reading:
@@ -158,8 +177,8 @@ class TextReaderApp:
                 self.reading = False
 
     def clock(self):
-        time = datetime.datetime.now().strftime("Time: %H:%M:%S")
-        self.root.title(time)
+        time_str = datetime.datetime.now().strftime("Time: %H:%M:%S")
+        self.root.title(time_str)
         self.root.after(1000, self.clock)
 
 if __name__ == "__main__":
